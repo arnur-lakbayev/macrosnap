@@ -1,0 +1,9 @@
+{
+  "name": "MacroSnap EXACT",
+  "short_name": "MacroSnap",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#090A0F",
+  "theme_color": "#090A0F",
+  "icons": []
+}
