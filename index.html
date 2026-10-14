@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MacroSnap EXACT - Точный калоризатор</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#090A0F">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+      body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #090A0F; color: #F8FAFC; }
+    </style>
+</head>
+<body class="min-h-screen pb-12">
+    <div class="max-w-md mx-auto px-4 pt-6">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
+                    ⚡ MacroSnap <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-semibold border border-emerald-500/30">EXACT</span>
+                </h1>
+                <p class="text-xs text-slate-400 mt-0.5">Для Samsung Health • Без диапазонов</p>
+            </div>
+            <button id="langToggle" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 border border-slate-700 transition">
+                RU | EN
+            </button>
+        </header>
+
+        <!-- Samsung Health Quick Transfer Card -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 mb-6 shadow-xl backdrop-blur">
+            <div class="flex justify-between items-center mb-3">
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Итог для Samsung Health</span>
+                <button onclick="copyAll()" class="text-xs text-emerald-400 hover:text-emerald-300 font-medium flex items-center gap-1 bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20">
+                    📋 Скопировать всё
+                </button>
+            </div>
+            <div class="grid grid-cols-4 gap-2 text-center">
+                <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80">
+                    <div id="totKcal" class="text-lg font-black text-amber-400">0</div>
+                    <div class="text-[10px] text-slate-400 font-medium mt-0.5">Ккал</div>
+                </div>
+                <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80">
+                    <div id="totP" class="text-lg font-black text-blue-400">0</div>
+                    <div class="text-[10px] text-slate-400 font-medium mt-0.5">Белки</div>
+                </div>
+                <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80">
+                    <div id="totC" class="text-lg font-black text-emerald-400">0</div>
+                    <div class="text-[10px] text-slate-400 font-medium mt-0.5">Углевод</div>
+                </div>
+                <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80">
+                    <div id="totF" class="text-lg font-black text-purple-400">0</div>
+                    <div class="text-[10px] text-slate-400 font-medium mt-0.5">Жиры</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Section -->
+        <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 mb-6">
+            <label class="block text-xs font-semibold text-slate-300 mb-2">Опишите блюдо или сфотографируйте</label>
+            <textarea id="foodInput" rows="3" placeholder="Например: 200г вареной гречки, 150г куриного филе, 1 ч.л. масла..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition resize-none"></textarea>
+            
+            <div class="flex flex-wrap gap-2 mt-3 items-center justify-between">
+                <div class="flex gap-2">
+                    <select id="prepMode" class="bg-slate-950 border border-slate-800 text-xs text-slate-300 rounded-xl px-3 py-2 outline-none">
+                        <option value="home">Домашняя еда</option>
+                        <option value="resto">Ресторан+ (скрытые жиры)</option>
+                        <option value="clean">Без масла / Диета</option>
+                    </select>
+                </div>
+                <button onclick="calculateFood()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-5 py-2 rounded-xl text-sm transition shadow-lg shadow-emerald-500/20">
+                    Рассчитать ⚡
+                </button>
+            </div>
+        </div>
+
+        <!-- Ingredients breakdown -->
+        <div id="resultsContainer" class="space-y-3">
+            <!-- Dynamic ingredients will appear here -->
+        </div>
+    </div>
+
+    <script>
+        let currentLang = 'ru';
+        function copyAll() {
+            const kcal = document.getElementById('totKcal').innerText;
+            const p = document.getElementById('totP').innerText;
+            const c = document.getElementById('totC').innerText;
+            const f = document.getElementById('totF').innerText;
+            const text = `Ккал: ${kcal}, Б: ${p}г, У: ${c}г, Ж: ${f}г`;
+            navigator.clipboard.writeText(text);
+            alert('Скопировано в буфер обмена для Samsung Health!');
+        }
+        function calculateFood() {
+            // Демо-расчет для проверки работы интерфейса
+            document.getElementById('totKcal').innerText = '485';
+            document.getElementById('totP').innerText = '42.5';
+            document.getElementById('totC').innerText = '52.0';
+            document.getElementById('totF').innerText = '11.2';
+            
+            const container = document.getElementById('resultsContainer');
+            container.innerHTML = `
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex justify-between items-center">
+                    <div>
+                        <div class="text-sm font-bold text-white">Куриное филе (отварное)</div>
+                        <div class="text-xs text-slate-400">150г • 248 ккал (Б: 45 | У: 0 | Ж: 3.6)</div>
+                    </div>
+                    <span class="text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">Точно</span>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex justify-between items-center">
+                    <div>
+                        <div class="text-sm font-bold text-white">Гречка отварная</div>
+                        <div class="text-xs text-slate-400">200г • 200 ккал (Б: 8 | У: 42 | Ж: 2)</div>
+                    </div>
+                    <span class="text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">Точно</span>
+                </div>
+            `;
+        }
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js');
+            });
+        }
+    </script>
+</body>
+</html>
